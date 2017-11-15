@@ -89,12 +89,14 @@ void cOsdMenuCISlot::Set()
 
     cUtils::AddFloatingText(this, *tmp, 45);
 
+#ifdef REELVDR
     //blank line
     Add(new cOsdItem("", osUnknown, false));
 
     tmp = cString::sprintf("%s %s", tr("CI-slot for"), *name);
 
     Add(new cMenuEditMyCaItem(*tmp, &caids[0], channel==NULL));
+#endif
 
     Display();
 }

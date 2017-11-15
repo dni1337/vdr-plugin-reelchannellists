@@ -49,13 +49,15 @@ SOFILE = libvdr-$(PLUGIN).so
 
 ### Libraries
 
-LIBS = $(shell curl-config --libs)
+LIBS =
 
 ### Includes and Defines (add further entries here):
 
 INCLUDES +=
 
 DEFINES += -DPLUGIN_NAME_I18N='"$(PLUGIN)"'
+
+#DEFINES += -DREELVDR
 
 ifneq ($(strip $(GITTAG)),)
 DEFINES += -DGITVERSION='"-GIT-$(GITTAG)"'

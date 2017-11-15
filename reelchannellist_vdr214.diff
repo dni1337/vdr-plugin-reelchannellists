@@ -1,0 +1,418 @@
+Index: activelist.c
+===================================================================
+--- activelist.c	(revision 19502)
++++ activelist.c	(working copy)
+@@ -24,8 +24,9 @@
+     savedGlobalFilters      = globalFilters;
+     savedFavouritesFilters  = favouritesFilters;
+     savedWasLastMenuFav = isFav;
+-
++#ifdef REELVDR
+     Setup.UseZonedChannelList = true;
++#endif
+ 
+     savedGlobalFilters.Save();
+     savedFavouritesFilters.Save();
+Index: favourites.c
+===================================================================
+--- favourites.c	(revision 19502)
++++ favourites.c	(working copy)
+@@ -5,6 +5,7 @@
+ #include "MenuCISlot.h"
+ #include <vdr/interface.h>
+ #include <vdr/plugin.h>
++#include "tools.h"
+ 
+ 
+ cChannels favourites;
+@@ -29,7 +30,9 @@
+                 }
+ 
+                 // update Caids if they differ
++#ifdef REELVDR
+                 ch->ForceCaIds(vdrCh->Caids());
++#endif
+             } else
+                 esyslog("fav. channel '%s' not found in vdr's channel list!", ch->Name());
+         }
+@@ -58,7 +61,9 @@
+     if (IsBouquetInFavourites(folderName)) return false;
+ 
+     cChannel *channel = new cChannel;
++#ifdef REELVDR
+     channel->SetGroupSep(true); /* make it a bouquet */
++#endif
+     channel->SetName(folderName, "", "");
+     favourites.Add(channel); /* add bouquet to the end of the list */
+ 
+@@ -394,15 +399,15 @@
+     // lets not have empty menus
+     if (Count()==0) { // no osditems
+         if (mode == eFavFolders) {
+-            AddFloatingText(tr("No favourite folders available"), 50);
++            cUtils::AddFloatingText(this, tr("No favourite folders available"), 50);
+             Add(new cOsdItem("",osUnknown, false)); // blank line
+             Add(new cOsdItem("",osUnknown, false)); // blank line
+             Add(new cOsdItem("",osUnknown, false)); // blank line
+             Add(new cOsdItem("",osUnknown, false)); // blank line
+             Add(new cOsdItem(tr("Info:"), osUnknown, false));
+-            AddFloatingText(tr("Please select 'all Channels' to add channels to your favorites."), 50);
++            cUtils::AddFloatingText(this, tr("Please select 'all Channels' to add channels to your favorites."), 50);
+        } else {
+-            AddFloatingText(tr("No channels in this bouquet"), 50);
++            cUtils::AddFloatingText(this, tr("No channels in this bouquet"), 50);
+     }
+  } else {
+         if (!currentSet) {
+@@ -770,7 +775,7 @@
+     // clear name
+     folderName[0] = 0;
+ 
+-    AddFloatingText(tr("Enter new favourites folder name"), 50);
++    cUtils::AddFloatingText(this, tr("Enter new favourites folder name"), 50);
+     Add(new cOsdItem("",osUnknown, false));
+     Add(new cMenuEditStrItem(tr("Folder name"), folderName, sizeof(folderName)-1));
+ 
+@@ -843,9 +848,9 @@
+     SetCols(6);
+ 
+     if (CountFavFolders() == 0)
+-        AddFloatingText(tr("You have no favourite folders. Please create one before you can add the channel"), 50);
++        cUtils::AddFloatingText(this, tr("You have no favourite folders. Please create one before you can add the channel"), 50);
+      else
+-        AddFloatingText (cString::sprintf(tr("Select folder for %d channels"),
++        cUtils::AddFloatingText (this, cString::sprintf(tr("Select folder for %d channels"),
+                                           channelsToAdd.size())
+                          , 50);
+ 
+@@ -1082,7 +1087,7 @@
+                                          channel ? channel->Name() : "undefined"
+                                          );
+ 
+-    AddFloatingText(*note_text, 45);
++    cUtils::AddFloatingText(this, *note_text, 45);
+     Add(new cOsdItem("",osUnknown, false)); // blank line
+     // Add(new cOsdItem("",osUnknown, false)); // blank line
+ 
+@@ -1259,7 +1264,7 @@
+     Clear();
+     SetCols(20);
+ 
+-    AddFloatingText(tr("Rename favourites folder"), 50);
++    cUtils::AddFloatingText(this, tr("Rename favourites folder"), 50);
+    // Add(new cOsdItem("", osUnknown, false)); //empty line
+ 
+     Add(new cMenuEditStrItem(tr("New folder name"), folderName, sizeof(folderName)));
+@@ -1269,7 +1274,7 @@
+         Add(new cOsdItem("",osUnknown, false)); //blank lines
+ 
+     Add(new cOsdItem(tr("Info:"),osUnknown, false));
+-    AddFloatingText(tr("Press right key to enter folder name and Ok to rename."), 50);
++    cUtils::AddFloatingText(this, tr("Press right key to enter folder name and Ok to rename."), 50);
+ 
+     Display();
+ }
+Index: menu.c
+===================================================================
+--- menu.c	(revision 19502)
++++ menu.c	(working copy)
+@@ -479,7 +479,7 @@
+ 
+     // no channels being shown. Eg. No result from Text search.
+     if (Count() == 0) {
+-        AddFloatingText(tr("No channels found.\nPress red key to list all channels."), 50);
++        cUtils::AddFloatingText(this, tr("No channels found.\nPress red key to list all channels."), 50);
+     }
+ 
+     cString tmpTitle = globalFilters.MakeTitle();
+@@ -818,7 +818,11 @@
+ #define PL_NAME "reelchannellist"
+                 cPlugin *p = cPluginManager::GetPlugin(PL_NAME);
+                 if (p)
++#ifdef REELVDR
+                     p->SetupStore("ChannelSortMode", PL_NAME, (int)ChannelSortMode);
++#else
++                    p->SetupStore("ChannelSortMode", (int)ChannelSortMode);
++#endif
+                 else
+                     esyslog("getting plugin %s failed! %s:%d"
+                                              , PL_NAME, __FILE__, __LINE__);
+@@ -1350,7 +1354,7 @@
+     if (cMenuChannelList::IsSelectToAddMode()) {
+         cString note = cString::sprintf(tr("Add the %d selected channels to favourites with the option below:"),
+             cMenuChannelList::SelectedChannels.size());
+-        AddFloatingText(note, 45);
++        cUtils::AddFloatingText(this, note, 45);
+ 
+         Add(new cOsdItem("",osUnknown, false)); // blank line
+         Add(new cOsdItem(hk(tr("Add multiple channels to Favourites"))));
+@@ -1359,7 +1363,7 @@
+     } else if (cMenuChannelList::IsSelectToDeleteMode()) {
+         cString note = cString::sprintf(tr("Delete the %d selected channels:"),
+             cMenuChannelList::SelectedChannels.size());
+-        AddFloatingText(note, 45);
++        cUtils::AddFloatingText(this, note, 45);
+ 
+         Add(new cOsdItem("",osUnknown, false)); // blank line
+         Add(new cOsdItem(hk(tr("Delete channels"))));
+@@ -1373,12 +1377,14 @@
+ 
+     cString note_text = cString::sprintf(tr("For channel '%s' please choose one of the following options:"),
+                                          channel->Name());
+-    AddFloatingText(*note_text, 45);
++    cUtils::AddFloatingText(this, *note_text, 45);
+     Add(new cOsdItem("",osUnknown, false)); // blank line
+     //Add(new cOsdItem("",osUnknown, false)); // blank line
+ 
+     Add(new cOsdItem(hk(tr("Move channel"))));
++#ifdef REELVDR
+     Add(new cOsdItem(hk(tr("Edit selected channel"))));
++#endif
+ 
+     //if (!IsChannelInFavourites(channel))
+     Add(new cOsdItem(hk(tr("Add selected channel to Favourites"))));
+@@ -1460,8 +1466,10 @@
+             if(text) {
+                 if (strstr(text, tr("Move channel")))
+                     return AddSubMenu(new cMenuMoveChannels(channel));
++#ifdef REELVDR
+                 else if(strstr(text, tr("Edit selected channel")))
+                     return AddSubMenu(new cMenuMyEditChannel(channel));
++#endif
+                 else if(strstr(text, tr("Search for channel")))
+                     return AddSubMenu(new cMenuChannelSearch);
+                 else if (strstr(text, tr("Add selected channel to Favourites"))) {
+@@ -1550,7 +1558,7 @@
+     Clear();
+     SetCols(15);
+ 
+-    AddFloatingText(tr("Enter string to search"), 50);
++    cUtils::AddFloatingText(this, tr("Enter string to search"), 50);
+     Add(new cOsdItem("",osUnknown, false));
+     Add(new cMenuEditStrItem(tr("Search for"), searchText, sizeof(searchText)/*, tr("abcdefghijklmnopqrstuvwxyz "*/));
+ }
+Index: MenuCISlot.c
+===================================================================
+--- MenuCISlot.c	(revision 19502)
++++ MenuCISlot.c	(working copy)
+@@ -1,6 +1,7 @@
+ #include "MenuCISlot.h"
+ #include "favourites.h"
+ #include "menu.h"
++#include "tools.h"
+ 
+ cOsdMenuCISlot::cOsdMenuCISlot(cString param, bool isFav, cChannel *channel_):
+     cOsdMenu(trVDR("Functions: CI-slot assignment")),
+@@ -86,7 +87,7 @@
+                            *param);
+ 
+ 
+-    AddFloatingText(*tmp, 45);
++    cUtils::AddFloatingText(this, *tmp, 45);
+ 
+     //blank line
+     Add(new cOsdItem("", osUnknown, false));
+Index: reelchannellist.c
+===================================================================
+--- reelchannellist.c	(revision 19502)
++++ reelchannellist.c	(working copy)
+@@ -192,6 +192,7 @@
+ 
+ bool cPluginReelChannellist::Service(const char *Id, void *Data)
+ {
++#ifdef REELVDR
+     // Handle custom service requests from other plugins
+     if (Id && !strcmp(Id, "reload favourites list")) {
+         LoadFavouritesList();
+@@ -308,6 +309,9 @@
+         return true;
+     }
+     return false;
++#else
++	return false;
++#endif
+ }
+ 
+ const char **cPluginReelChannellist::SVDRPHelpPages(void)
+Index: setup.c
+===================================================================
+--- setup.c	(revision 19502)
++++ setup.c	(working copy)
+@@ -2,7 +2,11 @@
+ 
+ int zapAllFavChannels;
+ 
++#ifdef REELVDR
+ cMenuReelChannelListSetup::cMenuReelChannelListSetup() : wantChOnOkTmp(Setup.WantChListOnOk)
++#else
++cMenuReelChannelListSetup::cMenuReelChannelListSetup() : wantChOnOkTmp(true)
++#endif
+ {
+     wantChOnOkModes.Append(strdup(tr("Channel Info")));
+     wantChOnOkModes.Append(strdup(tr("Standard")));
+@@ -15,7 +19,9 @@
+ {
+     Clear();
+     newZapAllFavChannels = zapAllFavChannels;
++#ifdef REELVDR
+     wantChOnOkTmp = Setup.WantChListOnOk;
++#endif
+ 
+     /*
+     Add(new cMenuEditBoolItem(tr("Zapping in favourites list"),
+@@ -31,7 +37,9 @@
+ void cMenuReelChannelListSetup::Store()
+ {
+     zapAllFavChannels = newZapAllFavChannels;
++#ifdef REELVDR
+     Setup.WantChListOnOk = wantChOnOkTmp;
++#endif
+ 
+     SetupStore("ZapAllFavChannels", zapAllFavChannels);
+ }
+Index: tools.c
+===================================================================
+--- tools.c	(revision 19502)
++++ tools.c	(working copy)
+@@ -153,3 +153,102 @@
+ 
+             return NumpadToChar(pressedNum, multiples);
+ }
++
++#ifndef REELVDR
++// create a new string on the heap that has a maximum 'maxlen' number of
++// characters (each can span multiple bytes)
++//
++// tries to find end of words to break the string
++// returned char* (if not NULL) must be freed by caller
++//
++// bytesCopied used by the caller to jump in the input string
++char* BreakString(const char*str, int maxlen, int &bytesCopied)
++{
++	bytesCopied = 0;
++	if (!str) return NULL;
++
++	// number of chars
++	int symCount = Utf8StrLen(str);
++
++	// convert UTF-8 multi-byte char to a single uint number
++	uint *inp_sym = new uint[symCount+1]; // +1 for the '\0'
++	int inp_sym_len = Utf8ToArray(str, inp_sym, symCount+1);
++
++	// number of chars in the string less than the maxlen
++	// TODO: if there is a '\n' in this part!
++	if (inp_sym_len <= maxlen)
++	{
++		// copy the input string
++		bytesCopied = strlen(str);
++
++		delete[] inp_sym;
++		//printf("** just copied **\n");
++		return strdup(str);
++	}
++
++	// create string on heap that can hold maxlen (multi-byte)chars
++	char *s = (char*) malloc((4*maxlen+1)*sizeof(char)); //+1 for '\0'
++
++	int i = 0;
++
++	// if no wordbreaks found, break after maxlen characters
++	int line_end = maxlen;
++
++	// donot show the char that was used to break the string
++	// for eg. ' ' is unnecessary at the end/beginning of a line
++	int skip_symbol = 0;
++
++	//the string here is longer than requested. Break it down.
++	for (i = 0; i < maxlen; ++i)
++	{
++		//look for word breaks and new lines
++		if (inp_sym[i] == '\0' || inp_sym[i] == '\n')
++		{
++			line_end = i;
++			if (inp_sym[i] != '\0')
++				skip_symbol = 1;
++			break; // found end of line exit loop
++		}
++		else if (inp_sym[i] == ' ') //space
++		{
++			line_end = i;
++			skip_symbol = 1;
++		}
++	}//for
++
++	// create char from uint array, since the char* is large enough
++	// 	it will be '\0' terminated
++	bytesCopied = Utf8FromArray(inp_sym, s, 4*maxlen-1,line_end);
++
++	if (skip_symbol)// jump over the last symbol since it is a ' ' or '\n'
++		++bytesCopied;
++
++	delete[] inp_sym;
++	return s;
++}
++// breaks given text into smaller 'maxChar' length strings and
++// displays them as unselectable text on OSD
++void cUtils::AddFloatingText(cOsdMenu *m, const char* text, int maxChars)
++{
++        // empty string; display nothing
++        if(!text) return;
++
++        char *p = NULL;
++        int copied = 0;
++
++        //printf("\tFloating Text (%i): '%s'\n", maxChars, text);
++        while(*text)
++        {
++                // returns a pointer to a char string with atmost maxChars characters (not bytes)
++                // p has to be freed; p is NULL if text was null
++                p = BreakString(text, maxChars, copied);
++                text += copied; //jump bytes not chars
++                if(p)
++                {
++                        m->Add(new cOsdItem(p, osUnknown,false)); // unselectable text
++                        free(p); p = NULL;
++                }
++        }
++}
++#endif /* REELVDR */
++
+Index: tools.h
+===================================================================
+--- tools.h	(revision 19502)
++++ tools.h	(working copy)
+@@ -3,6 +3,7 @@
+ 
+ #include <vdr/tools.h>
+ #include <vdr/channels.h>
++#include <vdr/osdbase.h>
+ #include <vdr/epg.h>
+ #include <vdr/keys.h>
+ 
+@@ -32,4 +33,12 @@
+ char NumpadChar(eKeys Key);
+ char NumpadToChar(unsigned int k, unsigned int multiples=0);
+ 
++#ifndef REELVDR
++class cUtils: public cOsdMenu
++{
++public:
++	static void AddFloatingText(cOsdMenu * m, const char* text, int maxlen);
++};
++#endif
++
+ #endif // TOOLS_H
+Index: Makefile
+===================================================================
+--- Makefile	(revision 19502)
++++ Makefile	(working copy)
+@@ -11,7 +11,8 @@
+ 
+ ### The object files (add further files here):
+ 
+-OBJS = $(PLUGIN).o menu.o menuitem.o channelListFilter.o tools.o MenuEditChannel.o favourites.o activelist.o MenuCISlot.o setup.o MenuMoveChannels.o
++# OBJS = $(PLUGIN).o menu.o menuitem.o channelListFilter.o tools.o MenuEditChannel.o favourites.o activelist.o MenuCISlot.o setup.o MenuMoveChannels.o
++OBJS = $(PLUGIN).o menu.o menuitem.o channelListFilter.o tools.o favourites.o activelist.o MenuCISlot.o setup.o MenuMoveChannels.o
+ 
+ ### The directory environment:
+ 

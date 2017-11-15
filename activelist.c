@@ -24,8 +24,9 @@ bool SaveFilteredChannelList(bool isFav)
     savedGlobalFilters      = globalFilters;
     savedFavouritesFilters  = favouritesFilters;
     savedWasLastMenuFav = isFav;
-
+#ifdef REELVDR
     Setup.UseZonedChannelList = true;
+#endif
 
     savedGlobalFilters.Save();
     savedFavouritesFilters.Save();

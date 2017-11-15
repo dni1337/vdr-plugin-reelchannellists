@@ -1,6 +1,7 @@
 #include "MenuCISlot.h"
 #include "favourites.h"
 #include "menu.h"
+#include "tools.h"
 
 cOsdMenuCISlot::cOsdMenuCISlot(cString param, bool isFav, cChannel *channel_):
     cOsdMenu(trVDR("Functions: CI-slot assignment")),
@@ -86,7 +87,7 @@ void cOsdMenuCISlot::Set()
                            *param);
 
 
-    AddFloatingText(*tmp, 45);
+    cUtils::AddFloatingText(this, *tmp, 45);
 
     //blank line
     Add(new cOsdItem("", osUnknown, false));

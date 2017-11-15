@@ -3,6 +3,7 @@
 
 #include <vdr/tools.h>
 #include <vdr/channels.h>
+#include <vdr/osdbase.h>
 #include <vdr/epg.h>
 #include <vdr/keys.h>
 
@@ -31,5 +32,13 @@ const cEvent* GetPresentEvent(const cChannel* channel);
 
 char NumpadChar(eKeys Key);
 char NumpadToChar(unsigned int k, unsigned int multiples=0);
+
+#ifndef REELVDR
+class cUtils: public cOsdMenu
+{
+public:
+	static void AddFloatingText(cOsdMenu * m, const char* text, int maxlen);
+};
+#endif
 
 #endif // TOOLS_H

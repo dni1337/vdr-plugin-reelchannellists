@@ -479,7 +479,7 @@ void cMenuChannelList::Set()
 
     // no channels being shown. Eg. No result from Text search.
     if (Count() == 0) {
-        AddFloatingText(tr("No channels found.\nPress red key to list all channels."), 50);
+        cUtils::AddFloatingText(this, tr("No channels found.\nPress red key to list all channels."), 50);
     }
 
     cString tmpTitle = globalFilters.MakeTitle();
@@ -818,7 +818,11 @@ eOSState cMenuChannelList::ProcessKey(eKeys Key)
 #define PL_NAME "reelchannellist"
                 cPlugin *p = cPluginManager::GetPlugin(PL_NAME);
                 if (p)
+#ifdef REELVDR
                     p->SetupStore("ChannelSortMode", PL_NAME, (int)ChannelSortMode);
+#else
+                    p->SetupStore("ChannelSortMode", (int)ChannelSortMode);
+#endif
                 else
                     esyslog("getting plugin %s failed! %s:%d"
                                              , PL_NAME, __FILE__, __LINE__);
@@ -1350,7 +1354,7 @@ void cMenuChannelsFunction::Set()
     if (cMenuChannelList::IsSelectToAddMode()) {
         cString note = cString::sprintf(tr("Add the %d selected channels to favourites with the option below:"),
             cMenuChannelList::SelectedChannels.size());
-        AddFloatingText(note, 45);
+        cUtils::AddFloatingText(this, note, 45);
 
         Add(new cOsdItem("",osUnknown, false)); // blank line
         Add(new cOsdItem(hk(tr("Add multiple channels to Favourites"))));
@@ -1359,7 +1363,7 @@ void cMenuChannelsFunction::Set()
     } else if (cMenuChannelList::IsSelectToDeleteMode()) {
         cString note = cString::sprintf(tr("Delete the %d selected channels:"),
             cMenuChannelList::SelectedChannels.size());
-        AddFloatingText(note, 45);
+        cUtils::AddFloatingText(this, note, 45);
 
         Add(new cOsdItem("",osUnknown, false)); // blank line
         Add(new cOsdItem(hk(tr("Delete channels"))));
@@ -1373,12 +1377,14 @@ void cMenuChannelsFunction::Set()
 
     cString note_text = cString::sprintf(tr("For channel '%s' please choose one of the following options:"),
                                          channel->Name());
-    AddFloatingText(*note_text, 45);
+    cUtils::AddFloatingText(this, *note_text, 45);
     Add(new cOsdItem("",osUnknown, false)); // blank line
     //Add(new cOsdItem("",osUnknown, false)); // blank line
 
     Add(new cOsdItem(hk(tr("Move channel"))));
+#ifdef REELVDR
     Add(new cOsdItem(hk(tr("Edit selected channel"))));
+#endif
 
     //if (!IsChannelInFavourites(channel))
     Add(new cOsdItem(hk(tr("Add selected channel to Favourites"))));
@@ -1460,8 +1466,10 @@ eOSState cMenuChannelsFunction::ProcessKey(eKeys Key)
             if(text) {
                 if (strstr(text, tr("Move channel")))
                     return AddSubMenu(new cMenuMoveChannels(channel));
+#ifdef REELVDR
                 else if(strstr(text, tr("Edit selected channel")))
                     return AddSubMenu(new cMenuMyEditChannel(channel));
+#endif
                 else if(strstr(text, tr("Search for channel")))
                     return AddSubMenu(new cMenuChannelSearch);
                 else if (strstr(text, tr("Add selected channel to Favourites"))) {
@@ -1550,7 +1558,7 @@ void cMenuChannelSearch::Set()
     Clear();
     SetCols(15);
 
-    AddFloatingText(tr("Enter string to search"), 50);
+    cUtils::AddFloatingText(this, tr("Enter string to search"), 50);
     Add(new cOsdItem("",osUnknown, false));
     Add(new cMenuEditStrItem(tr("Search for"), searchText, sizeof(searchText)/*, tr("abcdefghijklmnopqrstuvwxyz "*/));
 }

@@ -2,7 +2,11 @@
 
 int zapAllFavChannels;
 
+#ifdef REELVDR
 cMenuReelChannelListSetup::cMenuReelChannelListSetup() : wantChOnOkTmp(Setup.WantChListOnOk)
+#else
+cMenuReelChannelListSetup::cMenuReelChannelListSetup() : wantChOnOkTmp(true)
+#endif
 {
     wantChOnOkModes.Append(strdup(tr("Channel Info")));
     wantChOnOkModes.Append(strdup(tr("Standard")));
@@ -15,7 +19,9 @@ void cMenuReelChannelListSetup::Set()
 {
     Clear();
     newZapAllFavChannels = zapAllFavChannels;
+#ifdef REELVDR
     wantChOnOkTmp = Setup.WantChListOnOk;
+#endif
 
     /*
     Add(new cMenuEditBoolItem(tr("Zapping in favourites list"),
@@ -31,7 +37,9 @@ void cMenuReelChannelListSetup::Set()
 void cMenuReelChannelListSetup::Store()
 {
     zapAllFavChannels = newZapAllFavChannels;
+#ifdef REELVDR
     Setup.WantChListOnOk = wantChOnOkTmp;
+#endif
 
     SetupStore("ZapAllFavChannels", zapAllFavChannels);
 }

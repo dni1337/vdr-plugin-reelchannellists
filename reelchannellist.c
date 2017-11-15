@@ -192,6 +192,7 @@ bool cPluginReelChannellist::SetupParse(const char *Name, const char *Value)
 
 bool cPluginReelChannellist::Service(const char *Id, void *Data)
 {
+#ifdef REELVDR
     // Handle custom service requests from other plugins
     if (Id && !strcmp(Id, "reload favourites list")) {
         LoadFavouritesList();
@@ -308,6 +309,9 @@ bool cPluginReelChannellist::Service(const char *Id, void *Data)
         return true;
     }
     return false;
+#else
+	return false;
+#endif
 }
 
 const char **cPluginReelChannellist::SVDRPHelpPages(void)

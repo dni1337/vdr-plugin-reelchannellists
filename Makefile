@@ -11,7 +11,8 @@ PLUGIN = reelchannellist
 
 ### The object files (add further files here):
 
-OBJS = $(PLUGIN).o menu.o menuitem.o channelListFilter.o tools.o MenuEditChannel.o favourites.o activelist.o MenuCISlot.o setup.o MenuMoveChannels.o
+# OBJS = $(PLUGIN).o menu.o menuitem.o channelListFilter.o tools.o MenuEditChannel.o favourites.o activelist.o MenuCISlot.o setup.o MenuMoveChannels.o
+OBJS = $(PLUGIN).o menu.o menuitem.o channelListFilter.o tools.o favourites.o activelist.o MenuCISlot.o setup.o MenuMoveChannels.o
 
 ### The directory environment:
 

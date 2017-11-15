@@ -5,6 +5,7 @@
 #include "MenuCISlot.h"
 #include <vdr/interface.h>
 #include <vdr/plugin.h>
+#include "tools.h"
 
 
 cChannels favourites;
@@ -29,7 +30,9 @@ bool UpdateFavChannelNames()
                 }
 
                 // update Caids if they differ
+#ifdef REELVDR
                 ch->ForceCaIds(vdrCh->Caids());
+#endif
             } else
                 esyslog("fav. channel '%s' not found in vdr's channel list!", ch->Name());
         }
@@ -58,7 +61,9 @@ bool AddNewFavFolder(const char* folderName,
     if (IsBouquetInFavourites(folderName)) return false;
 
     cChannel *channel = new cChannel;
+#ifdef REELVDR
     channel->SetGroupSep(true); /* make it a bouquet */
+#endif
     channel->SetName(folderName, "", "");
     favourites.Add(channel); /* add bouquet to the end of the list */
 
@@ -394,15 +399,15 @@ void cMenuFavourites::Set()
     // lets not have empty menus
     if (Count()==0) { // no osditems
         if (mode == eFavFolders) {
-            AddFloatingText(tr("No favourite folders available"), 50);
+            cUtils::AddFloatingText(this, tr("No favourite folders available"), 50);
             Add(new cOsdItem("",osUnknown, false)); // blank line
             Add(new cOsdItem("",osUnknown, false)); // blank line
             Add(new cOsdItem("",osUnknown, false)); // blank line
             Add(new cOsdItem("",osUnknown, false)); // blank line
             Add(new cOsdItem(tr("Info:"), osUnknown, false));
-            AddFloatingText(tr("Please select 'all Channels' to add channels to your favorites."), 50);
+            cUtils::AddFloatingText(this, tr("Please select 'all Channels' to add channels to your favorites."), 50);
        } else {
-            AddFloatingText(tr("No channels in this bouquet"), 50);
+            cUtils::AddFloatingText(this, tr("No channels in this bouquet"), 50);
     }
  } else {
         if (!currentSet) {
@@ -770,7 +775,7 @@ void cMenuCreateFavouritesFolder::Set()
     // clear name
     folderName[0] = 0;
 
-    AddFloatingText(tr("Enter new favourites folder name"), 50);
+    cUtils::AddFloatingText(this, tr("Enter new favourites folder name"), 50);
     Add(new cOsdItem("",osUnknown, false));
     Add(new cMenuEditStrItem(tr("Folder name"), folderName, sizeof(folderName)-1));
 
@@ -843,9 +848,9 @@ void cMenuAddChannelToFavourites::Set(bool selectLast)
     SetCols(6);
 
     if (CountFavFolders() == 0)
-        AddFloatingText(tr("You have no favourite folders. Please create one before you can add the channel"), 50);
+        cUtils::AddFloatingText(this, tr("You have no favourite folders. Please create one before you can add the channel"), 50);
      else
-        AddFloatingText (cString::sprintf(tr("Select folder for %d channels"),
+        cUtils::AddFloatingText (this, cString::sprintf(tr("Select folder for %d channels"),
                                           channelsToAdd.size())
                          , 50);
 
@@ -1082,7 +1087,7 @@ void cMenuFavouritesFunction::Set()
                                          channel ? channel->Name() : "undefined"
                                          );
 
-    AddFloatingText(*note_text, 45);
+    cUtils::AddFloatingText(this, *note_text, 45);
     Add(new cOsdItem("",osUnknown, false)); // blank line
     // Add(new cOsdItem("",osUnknown, false)); // blank line
 
@@ -1259,7 +1264,7 @@ void cMenuRenameFavFolder::Set()
     Clear();
     SetCols(20);
 
-    AddFloatingText(tr("Rename favourites folder"), 50);
+    cUtils::AddFloatingText(this, tr("Rename favourites folder"), 50);
    // Add(new cOsdItem("", osUnknown, false)); //empty line
 
     Add(new cMenuEditStrItem(tr("New folder name"), folderName, sizeof(folderName)));
@@ -1269,7 +1274,7 @@ void cMenuRenameFavFolder::Set()
         Add(new cOsdItem("",osUnknown, false)); //blank lines
 
     Add(new cOsdItem(tr("Info:"),osUnknown, false));
-    AddFloatingText(tr("Press right key to enter folder name and Ok to rename."), 50);
+    cUtils::AddFloatingText(this, tr("Press right key to enter folder name and Ok to rename."), 50);
 
     Display();
 }

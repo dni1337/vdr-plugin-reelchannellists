@@ -551,14 +551,21 @@ void cMenuFavourites::ShowNextFolder()
         }
     }
 
-    while(ch && !ch->GroupSep()) {
-        lastch = favourites.Prev(ch);
-        lastch = favourites.Next(lastch);
-        ch = favourites.Next(ch);
-        printf("bouquet1: %s\n",lastch->Name());
-        printf("bouquet2: %s\n",ch->Name());
-        if (lastch == ch){
-            ch = favourites.First();
+    lastch = ch;
+    while(lastch){
+        lastch = favourites.Prev(lastch);
+        if (lastch->GroupSep()){
+            printf("bouquet1: %s\n",lastch->Name());
+            while (ch){
+                ch = favourites.Next(ch);
+                if(ch->GroupSep()){
+                    printf("bouquet2: %s\n",ch->Name());
+                    if(lastch == ch){
+                        ch = favourites.First();
+                    }
+                 break;
+                }
+            }
         }
     }
 

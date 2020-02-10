@@ -561,7 +561,9 @@ void cMenuFavourites::ShowNextFolder()
                 if(ch->GroupSep()){
                     printf("bouquet2: %s\n",ch->Name());
                     if(lastch == ch){
+                        printf("test1\n");
                         ch = favourites.First();
+                        printf("test2\n");
                     }
                  break;
                 }
@@ -569,11 +571,18 @@ void cMenuFavourites::ShowNextFolder()
         }
     }
 
+    printf("test3\n");
+    
     if (ch && ch->GroupSep()) {
+        printf("test4\n");
         favouritesFilters.ClearFilters();
+        printf("test5\n");
         favouritesFilters.AddBouquetFilter(ch->Name(), true);
+        printf("test6\n");
         lastPosition = -1; // reset position of last selected item
+        printf("test7\n");
         Set();
+        printf("test8\n");
     }
 }
 

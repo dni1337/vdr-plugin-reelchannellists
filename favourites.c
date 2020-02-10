@@ -550,7 +550,7 @@ void cMenuFavourites::ShowNextFolder()
         }
     }
 
-    if (*lastSelectedFolder){
+    if (ch->GroupSep()){
         ch = favourites.First();
         printf("test1");
     } else {

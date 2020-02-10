@@ -506,6 +506,10 @@ void cMenuFavourites::ShowPrevFolder()
         if (currBouquet && currBouquet->GroupSep()) break;
     }
 
+    if (!currBouqet && !currBouquet->GroupSep()) {
+        currBouquet = favourites.Last();
+    }
+    
     if (currBouquet && currBouquet->GroupSep()) {
         favouritesFilters.ClearFilters();
         favouritesFilters.AddBouquetFilter(currBouquet->Name(), true);

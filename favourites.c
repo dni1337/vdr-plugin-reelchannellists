@@ -509,7 +509,11 @@ void cMenuFavourites::ShowPrevFolder()
     if (!currBouquet) {
         printf("getlast");
         while(currBouquet) {
+            currBouquet = favourites.Next(currBouquet);
+        }
+        while(currBouquet) {
             currBouquet = favourites.Prev(currBouquet);
+            if (currBouquet && currBouquet->GroupSep()) break;
         }
     }
     

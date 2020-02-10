@@ -316,6 +316,8 @@ cMenuFavourites::cMenuFavourites(bool startWithCurrChannelBouquet):
     printf("(%s:%d) Fav count: %d\n", __FILE__,
            __LINE__, favourites.Count());
 
+    printf("strrtwith... %d\n", startWithCurrChannelBouquet);
+        
     if (startWithCurrChannelBouquet) {
         // find bouquet of current channel, if current channel exists in fav. list
         cChannel *bouquet = FavCurrentBouquet();

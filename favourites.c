@@ -520,7 +520,6 @@ void cMenuFavourites::ShowNextFolder()
     printf("%s\n", __PRETTY_FUNCTION__);
     cOsdChannelItem *currItem = dynamic_cast<cOsdChannelItem*> (Get(Current()));
     cChannel *ch = NULL; // to point to a channel in current bouquet
-    cChannel *lastch = NULL;
     if (currItem) {
         ch = currItem->Channel();
     } else
@@ -550,26 +549,14 @@ void cMenuFavourites::ShowNextFolder()
             return;
         }
     }
-
-    lastch = ch;
-    while(lastch && !lastch->GroupSep()){
-        lastch = favourites.Prev(lastch);
-    }
-    
+   
     while (ch && !ch->GroupSep()){
         ch = favourites.Next(ch);
     }
     
-    printf("bouquet1: %s\n",lastch->Name());
-    
-    if (ch && ch->GroupSep()) {
-        printf("bouquet2: %s\n",ch->Name());
-    } else {
+    if (!ch && !ch->GroupSep()) {
         ch = favourites.First();
-        printf("bouquet3: %s\n",ch->Name());
     }
-    
-    printf("test1\n");
     
     if (ch && ch->GroupSep()) {
         favouritesFilters.ClearFilters();

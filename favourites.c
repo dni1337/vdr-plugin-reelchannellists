@@ -464,6 +464,7 @@ void cMenuFavourites::ShowPrevFolder()
 {
     cOsdChannelItem *currItem = dynamic_cast<cOsdChannelItem*> (Get(Current()));
     cChannel *currBouquet = NULL;
+    cChannel *lastBouquet = NULL;
     if (currItem) {
         currBouquet = currItem->Channel();
         // find current bouquet
@@ -507,13 +508,13 @@ void cMenuFavourites::ShowPrevFolder()
     }
 
     if (!currBouquet) {
-        printf("getlast");
-        while(currBouquet) {
-            currBouquet = favourites.Next(currBouquet);
-        }
-        while(currBouquet) {
-            currBouquet = favourites.Prev(currBouquet);
-            if (currBouquet && currBouquet->GroupSep()) break;
+        printf("getlast\n");
+        lastBouquet = currItem->Channel();
+        while(lastBouquet) {
+            lastBouquet = favourites.Next(lastBouquet);
+            if (lastBouquet && lastBouquet->GroupSep()){
+                currBouquet = lastBouquet;
+            }
         }
     }
     

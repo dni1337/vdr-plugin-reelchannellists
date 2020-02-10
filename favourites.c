@@ -506,7 +506,7 @@ void cMenuFavourites::ShowPrevFolder()
         if (currBouquet && currBouquet->GroupSep()) break;
     }
 
-    if (!currBouquet && !currBouquet->GroupSep()) {
+    if (currBouquet && !currBouquet->GroupSep()) {
         currBouquet = favourites.Last();
     }
     
@@ -558,7 +558,7 @@ void cMenuFavourites::ShowNextFolder()
         ch = favourites.Next(ch);
     }
     
-    if (!ch && !ch->GroupSep()) {
+    if (ch && !ch->GroupSep()) {
         ch = favourites.First();
     }
     

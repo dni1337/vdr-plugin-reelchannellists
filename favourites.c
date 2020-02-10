@@ -550,8 +550,12 @@ void cMenuFavourites::ShowNextFolder()
         }
     }
 
-
+    printf("test1");
     while(ch && !ch->GroupSep()) ch = favourites.Next(ch);
+    printf("test2");
+    if (*lastSelectedFolder){
+        ch = favourites.First();
+    }
 
     if (ch && ch->GroupSep()) {
         favouritesFilters.ClearFilters();
@@ -583,11 +587,11 @@ eOSState cMenuFavourites::ProcessKey(eKeys Key)
         bool isFirstItem = (Current() == 0);
         bool isLastItem  =  (Current() == Count()-1);
 
-        if ( (kLeft == NORMALKEY(Key) && isFirstItem) || kChanDn == NORMALKEY(Key)) {
+        if ( (kLeft == NORMALKEY(Key)) || kChanDn == NORMALKEY(Key)) {
             ShowPrevFolder();
             return osContinue;
         }
-        else if ( (kRight == NORMALKEY(Key) && isLastItem) || kChanUp == NORMALKEY(Key)) {
+        else if ( (kRight == NORMALKEY(Key)) || kChanUp == NORMALKEY(Key)) {
             ShowNextFolder();
             return osContinue;
         }
